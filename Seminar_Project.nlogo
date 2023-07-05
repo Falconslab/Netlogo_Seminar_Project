@@ -2,7 +2,9 @@ extensions [ gis ]
 globals [ countries-dataset
           should-draw-country-labels ]
 
-breed [ country-labels country-label ]
+breed [ country-labels country-label]
+breed [ships ship]
+breed [ports port]
 
 to setup
   clear-all
@@ -10,6 +12,13 @@ to setup
   set countries-dataset gis:load-dataset "data/countries.shp"
   ; Set the world envelope to the countries dataset's envelope
   gis:set-world-envelope (gis:envelope-of countries-dataset)
+
+  draw-countries
+  spawn-ports
+  spawn-lanes
+  spawn-ships
+
+
   reset-ticks
 end
 
@@ -21,14 +30,14 @@ end
 
 to spawn-ports
   ; x and y cor in list then one of
-  create-turtles 1[
+  create-ports 1[
     set xcor -8
     set ycor 39
     set shape "crate"
     set size 10
     set color pink
   ]
-  create-turtles 1[
+  create-ports 1[
     set xcor -70
     set ycor 33
     set shape "crate"
@@ -38,16 +47,45 @@ to spawn-ports
 end
 
 to spawn-lanes
-  ask turtles [
+  ask ports [
     create-links-with other turtles
     ask links [
       set color red
       set thickness 1
     ]
   ]
-
 end
 
+to spawn-ships
+  create-ships 1[
+    set xcor -70
+    set ycor 33
+    set shape "sailboat side"
+    set size 10
+    set color red
+  ]
+end
+
+to follow-line
+  ask ships[
+    let current-port-cor [ (list xcor ycor)] of ports in-radius 5
+    let current-port ports with [xcor = first item 0 current-port-cor and ycor = last item 0 current-port-cor ]
+    print current-port
+   ;let destination-port [other-end] of links with [end2 = current-port or end1 = current-port]
+    ask current-port[
+      ask one-of my-links [
+        ; irgendwie turtles own oder glubul
+        let x other-end
+      ]
+    ]
+
+    ;print x
+   ; print destination-port
+
+    ;move-to item 1 destination-port-cor
+
+  ]
+end
 
 
 to draw/clear-country-labels
@@ -118,46 +156,12 @@ NIL
 1
 
 BUTTON
-18
-58
-129
-91
+27
+89
+119
+122
 NIL
-draw-countries
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-21
-109
-118
-142
-NIL
-spawn-ports
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-28
-165
-126
-198
-NIL
-spawn-lanes
+follow-line
 NIL
 1
 T
