@@ -19,6 +19,37 @@ to draw-countries
   gis:draw countries-dataset 1
 end
 
+to spawn-ports
+  ; x and y cor in list then one of
+  create-turtles 1[
+    set xcor -8
+    set ycor 39
+    set shape "crate"
+    set size 10
+    set color pink
+  ]
+  create-turtles 1[
+    set xcor -70
+    set ycor 33
+    set shape "crate"
+    set size 10
+    set color pink
+  ]
+end
+
+to spawn-lanes
+  ask turtles [
+    create-links-with other turtles
+    ask links [
+      set color red
+      set thickness 1
+    ]
+  ]
+
+end
+
+
+
 to draw/clear-country-labels
   if-else should-draw-country-labels = 1 [
     set should-draw-country-labels 0
@@ -45,11 +76,11 @@ end
 GRAPHICS-WINDOW
 210
 10
-860
-341
+1272
+580
 -1
 -1
-2.0
+3.2835
 1
 10
 1
@@ -61,8 +92,8 @@ GRAPHICS-WINDOW
 1
 -160
 160
--80
-80
+-85
+85
 0
 0
 1
@@ -76,6 +107,57 @@ BUTTON
 50
 NIL
 setup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+18
+58
+129
+91
+NIL
+draw-countries
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+21
+109
+118
+142
+NIL
+spawn-ports
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+28
+165
+126
+198
+NIL
+spawn-lanes
 NIL
 1
 T
@@ -197,6 +279,20 @@ Polygon -7500403 true true 200 193 197 249 179 249 177 196 166 187 140 189 93 19
 Polygon -7500403 true true 73 210 86 251 62 249 48 208
 Polygon -7500403 true true 25 114 16 195 9 204 23 213 25 200 39 123
 
+crate
+false
+0
+Rectangle -7500403 true true 45 45 255 255
+Rectangle -16777216 false false 45 45 255 255
+Rectangle -16777216 false false 60 60 240 240
+Line -16777216 false 180 60 180 240
+Line -16777216 false 150 60 150 240
+Line -16777216 false 120 60 120 240
+Line -16777216 false 210 60 210 240
+Line -16777216 false 90 60 90 240
+Polygon -7500403 true true 75 240 240 75 240 60 225 60 60 225 60 240
+Polygon -16777216 false false 60 225 60 240 75 240 240 75 240 60 225 60
+
 cylinder
 false
 0
@@ -314,6 +410,22 @@ Polygon -7500403 true true 165 180 165 210 225 180 255 120 210 135
 Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
+
+sailboat side
+false
+0
+Line -16777216 false 0 240 120 210
+Polygon -7500403 true true 0 239 270 254 270 269 240 284 225 299 60 299 15 254
+Polygon -1 true false 15 240 30 195 75 120 105 90 105 225
+Polygon -1 true false 135 75 165 180 150 240 255 240 285 225 255 150 210 105
+Line -16777216 false 105 90 120 60
+Line -16777216 false 120 45 120 240
+Line -16777216 false 150 240 120 240
+Line -16777216 false 135 75 120 60
+Polygon -7500403 true true 120 60 75 45 120 30
+Polygon -16777216 false false 105 90 75 120 30 195 15 240 105 225
+Polygon -16777216 false false 135 75 165 180 150 240 255 240 285 225 255 150 210 105
+Polygon -16777216 false false 0 239 60 299 225 299 240 284 270 269 270 254
 
 sheep
 false
