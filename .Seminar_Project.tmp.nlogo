@@ -17,7 +17,13 @@ to setup
 
   draw-countries
   spawn-ports
+<<<<<<< Updated upstream
   ;spawn-lanes
+=======
+  spawn-waypoints
+  spawn-lanes
+  connect-ports
+>>>>>>> Stashed changes
   ;spawn-ships
 
 
@@ -49,6 +55,7 @@ to spawn-ports
 end
 
 to spawn-lanes
+<<<<<<< Updated upstream
   ask ports [
     create-links-with other turtles
     ask links [
@@ -56,7 +63,130 @@ to spawn-lanes
       set thickness 1
     ]
   ]
+=======
+  let current-waypoints-count  0
+
+    ask waypoint 2[
+    repeat 5[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+    ]
+
+  if (plan = "waittillopen")[
+
+
+    ask waypoint 2[
+    repeat 5[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+      let current-waypoints waypoint (12)
+      let next-waypoints waypoint (24)
+       if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+
+    ]
+
+  ]
+   if (plan = "divert")[
+     ask waypoint 2[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    let next-waypoints waypoint (13)
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+
+    set current-waypoints-count current-waypoints-count + 6
+    ask waypoint 2[
+    repeat 11[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+    ]
+  ]
+
+   ask waypoint 24[
+    set current-waypoints-count 0
+    repeat 3[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+  ]
+
+
+>>>>>>> Stashed changes
 end
+
+to connect-ports
+  ask port 0[
+    create-link-with way
+            ask links [
+      set color red
+      set thickness 1
+    ]
+  ]
+
+
+end
+
+
+
+
 
 to spawn-ships
   create-ships 1[
