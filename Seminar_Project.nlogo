@@ -49,6 +49,7 @@ to spawn-ports
 end
 
 to spawn-waypoints
+  ;China to Eritrea
   create-waypoints 1 [
     set xcor 100
     set ycor 16
@@ -99,7 +100,7 @@ to spawn-waypoints
     set size 3
   ]
 
-  ;Mediterainian + Suez
+  ;Suez to Gibralta
   create-waypoints 1 [
     set xcor 31
     set ycor 31
@@ -128,8 +129,84 @@ to spawn-waypoints
     set color yellow
     set size 3
   ]
-  ;Africa
 
+  ;Africa to Portugal
+  create-waypoints 1 [
+    set xcor 44
+    set ycor 5
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 38
+    set ycor -4
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 37
+    set ycor -12
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 34
+    set ycor -18
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 28
+    set ycor -26
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 19
+    set ycor -29
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 10
+    set ycor -21
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]create-waypoints 1 [
+    set xcor -3
+    set ycor -13
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -13
+    set ycor -1
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -18
+    set ycor 12
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -18
+    set ycor 25
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
 
 
 
