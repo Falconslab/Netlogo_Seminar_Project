@@ -1,6 +1,18 @@
 extensions [ gis ]
 globals [ countries-dataset
-          should-draw-country-labels ]
+          should-draw-country-labels
+
+  ; 0 = Open 1 = Blocked
+  isBlocked
+
+  ;0 = not waiting 1= waiting
+  ;
+  waiting
+
+  blockageLength
+
+  waitlength
+]
 
 breed [ country-labels country-label]
 breed [ships ship]
@@ -24,6 +36,14 @@ to setup
   connect-ports
   spawn-ships
 
+
+  ;Temp----
+  set isBlocked  0
+  set waiting 0
+  ;---
+
+
+  decide-wait-length
 
   reset-ticks
 end
@@ -382,9 +402,29 @@ to spawn-ships
   ]
 end
 
+to decide-wait-length
+  set waitlength waitmin + (random (waitmax - waitmin))
+end
+
+to decide-blockage-length
+  set blockageLength blockedatday - freeatday
+end
+
+
+to check-blockage-counter
+
+
+end
+
+
 to follow-line
 
   ask ships[
+
+    ifelse xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 1[
+      ;do nothing yet
+    ]
+    [
     let current-waypoint-cor [ (list xcor ycor)] of waypoints in-radius 3
     print current-waypoint-cor
     let current-waypoint waypoints with [xcor = first item 0 current-waypoint-cor and ycor = last item 0 current-waypoint-cor ]
@@ -398,7 +438,7 @@ to follow-line
     let dest-port one-of waypoints with [xcor = first item 0 destination-waypoint-end2 and ycor = last item 0 destination-waypoint-end2 ]
 
     move-to dest-port
-
+    ]
 
   ]
 end
@@ -575,6 +615,21 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot count turtles"
+
+SLIDER
+19
+282
+191
+315
+waitmin
+waitmin
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
