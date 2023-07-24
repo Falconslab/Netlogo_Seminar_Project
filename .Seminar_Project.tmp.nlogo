@@ -12,6 +12,8 @@ to setup
   set countries-dataset gis:load-dataset "data/countries.shp"
   ; Set the world envelope to the countries dataset's envelope
   gis:set-world-envelope (gis:envelope-of countries-dataset)
+  if freeatday < blockedatday [error "The blockade needs to happen before it can be lifted"]
+  if maxEarn < minEarn [error "The maximum earne
 
   draw-countries
   spawn-ports
@@ -183,16 +185,94 @@ plan
 0
 
 SLIDER
-55
+15
+110
+187
 143
-227
-176
 costperday
 costperday
 1
 1000000
-50.0
+1.0
 1000
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+151
+187
+184
+blockedatday
+blockedatday
+0
+100
+0.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+16
+192
+188
+225
+freeatday
+freeatday
+0
+100
+0.0
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+1294
+10
+1494
+160
+plot 1
+trip duration
+cost
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles"
+
+SLIDER
+17
+235
+189
+268
+minEarn
+minEarn
+1
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+17
+275
+189
+308
+maxEarn
+maxEarn
+1
+100
+50.0
+1
 1
 NIL
 HORIZONTAL
@@ -300,6 +380,37 @@ false
 0
 Circle -7500403 true true 0 0 300
 Circle -16777216 true false 30 30 240
+
+containership
+true
+0
+Rectangle -13840069 true false 150 180 240 210
+Rectangle -7500403 true true 60 270 75 285
+Rectangle -7500403 true true 45 255 60 270
+Rectangle -7500403 true true 30 240 45 255
+Rectangle -7500403 true true 75 270 240 285
+Rectangle -7500403 true true 240 255 255 270
+Rectangle -7500403 true true 255 240 270 255
+Rectangle -7500403 true true 30 210 45 240
+Rectangle -7500403 true true 255 210 270 240
+Rectangle -7500403 true true 45 210 255 225
+Rectangle -7500403 true true 45 135 60 210
+Rectangle -7500403 true true 60 135 105 150
+Rectangle -7500403 true true 90 150 105 210
+Rectangle -11221820 true false 75 150 90 165
+Rectangle -11221820 true false 75 165 90 180
+Rectangle -7500403 true true 60 150 75 210
+Rectangle -7500403 true true 75 195 90 210
+Rectangle -7500403 true true 75 180 90 195
+Rectangle -7500403 true true 210 195 270 210
+Rectangle -7500403 true true 225 180 270 195
+Rectangle -2674135 true false 150 150 240 180
+Rectangle -10899396 true false 45 240 120 255
+Rectangle -7500403 true true 45 225 255 240
+Rectangle -7500403 true true 120 240 255 255
+Rectangle -7500403 true true 60 255 240 270
+Rectangle -1 true false 150 180 180 195
+Rectangle -1184463 true false 150 150 180 165
 
 cow
 false
