@@ -374,8 +374,8 @@ end
 
 to spawn-ships
   create-ships 1[
-    set xcor -70
-    set ycor 33
+    set xcor 100
+    set ycor 16
     set shape "sailboat side"
     set size 10
     set color red
@@ -383,22 +383,22 @@ to spawn-ships
 end
 
 to follow-line
+
   ask ships[
-    let current-port-cor [ (list xcor ycor)] of ports in-radius 5
-    let current-port ports with [xcor = first item 0 current-port-cor and ycor = last item 0 current-port-cor ]
-    print current-port
-   ;let destination-port [other-end] of links with [end2 = current-port or end1 = current-port]
-    ask current-port[
-      ask one-of my-links [
-        ; irgendwie turtles own oder glubul
-        let x other-end
-      ]
-    ]
+    let current-waypoint-cor [ (list xcor ycor)] of waypoints in-radius 3
+    print current-waypoint-cor
+    let current-waypoint waypoints with [xcor = first item 0 current-waypoint-cor and ycor = last item 0 current-waypoint-cor ]
 
-    ;print x
-   ; print destination-port
+    let curr-waypoint  one-of current-waypoint
+    print curr-waypoint
 
-    ;move-to item 1 destination-port-cor
+    let destination-waypoint-end2 [[ (list xcor ycor)] of end2] of links with [end1 = curr-waypoint]
+    print destination-waypoint-end2
+
+    let dest-port one-of waypoints with [xcor = first item 0 destination-waypoint-end2 and ycor = last item 0 destination-waypoint-end2 ]
+
+    move-to dest-port
+
 
   ]
 end
