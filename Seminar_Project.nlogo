@@ -21,6 +21,7 @@ to setup
   spawn-ports
   spawn-waypoints
   spawn-lanes
+  connect-ports
   ;spawn-ships
 
 
@@ -248,7 +249,6 @@ to spawn-lanes
     ask waypoint 2[
     repeat 5[
     let current-waypoints  waypoint (who + current-waypoints-count)
-    print current-waypoints
     let next-waypoints waypoint (who + 1 + current-waypoints-count)
     set current-waypoints-count current-waypoints-count + 1
      if is-turtle? next-waypoints [
@@ -269,7 +269,52 @@ to spawn-lanes
     ask waypoint 2[
     repeat 5[
     let current-waypoints  waypoint (who + current-waypoints-count)
-    print current-waypoints
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+      let current-waypoints waypoint (12)
+      let next-waypoints waypoint (24)
+       if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+
+    ]
+
+  ]
+   if (plan = "divert")[
+     ask waypoint 2[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    let next-waypoints waypoint (13)
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+
+    set current-waypoints-count current-waypoints-count + 6
+    ask waypoint 2[
+    repeat 11[
+    let current-waypoints  waypoint (who + current-waypoints-count)
     let next-waypoints waypoint (who + 1 + current-waypoints-count)
     set current-waypoints-count current-waypoints-count + 1
      if is-turtle? next-waypoints [
@@ -285,6 +330,44 @@ to spawn-lanes
     ]
   ]
 
+   ask waypoint 24[
+    set current-waypoints-count 0
+    repeat 3[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+  ]
+
+
+end
+
+to connect-ports
+  ask port 0[
+    create-link-with waypoint 26
+            ask links [
+      set color red
+      set thickness 1
+    ]
+  ]
+
+
+    ask port 1[
+    create-link-with waypoint 2
+            ask links [
+      set color red
+      set thickness 1
+    ]
+  ]
 
 
 end
@@ -413,7 +496,7 @@ CHOOSER
 plan
 plan
 "divert" "waittillopen"
-1
+0
 
 SLIDER
 15
@@ -459,6 +542,39 @@ freeatday
 1
 NIL
 HORIZONTAL
+
+SLIDER
+16
+234
+188
+267
+waitmax
+waitmax
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+1285
+12
+1865
+233
+CostIndex
+time
+coast
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles"
 
 @#$#@#$#@
 ## WHAT IS IT?
