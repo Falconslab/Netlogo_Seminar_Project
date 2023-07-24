@@ -5,19 +5,22 @@ globals [ countries-dataset
 breed [ country-labels country-label]
 breed [ships ship]
 breed [ports port]
+breed [waypoints waypoint]
 
 to setup
   clear-all
   ; Load the countries dataset
   set countries-dataset gis:load-dataset "data/countries.shp"
+  ;set cities-dataset gis:load-dataset "data/cities.shp"
   ; Set the world envelope to the countries dataset's envelope
   gis:set-world-envelope (gis:envelope-of countries-dataset)
   if freeatday < blockedatday [error "The blockade needs to happen before it can be lifted"]
-  if maxEarn < minEarn [error "The maximum earne
+
 
   draw-countries
   spawn-ports
-  ;spawn-lanes
+  spawn-waypoints
+  spawn-lanes
   ;spawn-ships
 
 
@@ -28,6 +31,7 @@ end
 to draw-countries
   gis:set-drawing-color green
   gis:draw countries-dataset 1
+  ;gis:draw
 end
 
 to spawn-ports
@@ -48,14 +52,241 @@ to spawn-ports
   ]
 end
 
+to spawn-waypoints
+  ;China to Eritrea
+  create-waypoints 1 [
+    set xcor 100
+    set ycor 16
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 96
+    set ycor 6
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 88
+    set ycor 10
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 77
+    set ycor 7
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 65
+    set ycor 11
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 50
+    set ycor 15
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 37
+    set ycor 19
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+
+  ;Suez to Gibralta
+  create-waypoints 1 [
+    set xcor 31
+    set ycor 31
+    set shape "triangle 2"
+    set color yellow
+    set size 5
+  ]
+  create-waypoints 1 [
+    set xcor 19
+    set ycor 33
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 10
+    set ycor 38
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -3
+    set ycor 37
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+
+  ;Africa to Portugal
+  create-waypoints 1 [
+    set xcor 44
+    set ycor 5
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 38
+    set ycor -4
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 37
+    set ycor -12
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 34
+    set ycor -18
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 28
+    set ycor -26
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 19
+    set ycor -29
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 10
+    set ycor -21
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]create-waypoints 1 [
+    set xcor -3
+    set ycor -13
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -13
+    set ycor -1
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -18
+    set ycor 12
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -18
+    set ycor 25
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+
+
+
+
+  ; Coast of Portugal
+  create-waypoints 1 [
+    set xcor -13
+    set ycor 37
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -8
+    set ycor 45
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -1
+    set ycor 48
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+end
+
+
+
+
 to spawn-lanes
-  ask ports [
-    create-links-with other turtles
-    ask links [
+  let current-waypoints-count  0
+
+    ask waypoint 2[
+    repeat 5[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    print current-waypoints
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
       set color red
       set thickness 1
     ]
+        ]
+      ]
+    ]
+    ]
+
+  if (plan = "waittillopen")[
+
+
+    ask waypoint 2[
+    repeat [
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    print current-waypoints
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+    ]
   ]
+
+
+
 end
 
 to spawn-ships
@@ -182,7 +413,7 @@ CHOOSER
 plan
 plan
 "divert" "waittillopen"
-0
+1
 
 SLIDER
 15
@@ -224,54 +455,6 @@ freeatday
 0
 100
 0.0
-1
-1
-NIL
-HORIZONTAL
-
-PLOT
-1294
-10
-1494
-160
-plot 1
-trip duration
-cost
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles"
-
-SLIDER
-17
-235
-189
-268
-minEarn
-minEarn
-1
-100
-50.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-17
-275
-189
-308
-maxEarn
-maxEarn
-1
-100
-50.0
 1
 1
 NIL

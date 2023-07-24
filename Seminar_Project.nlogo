@@ -11,7 +11,7 @@ to setup
   clear-all
   ; Load the countries dataset
   set countries-dataset gis:load-dataset "data/countries.shp"
-  set cities-dataset gis:load-dataset "data/cities.shp"
+  ;set cities-dataset gis:load-dataset "data/cities.shp"
   ; Set the world envelope to the countries dataset's envelope
   gis:set-world-envelope (gis:envelope-of countries-dataset)
   if freeatday < blockedatday [error "The blockade needs to happen before it can be lifted"]
@@ -20,7 +20,7 @@ to setup
   draw-countries
   spawn-ports
   spawn-waypoints
-  ;spawn-lanes
+  spawn-lanes
   ;spawn-ships
 
 
@@ -31,7 +31,7 @@ end
 to draw-countries
   gis:set-drawing-color green
   gis:draw countries-dataset 1
-  gis:draw
+  ;gis:draw
 end
 
 to spawn-ports
@@ -243,13 +243,50 @@ end
 
 
 to spawn-lanes
-  ask ports [
-    create-links-with other turtles
-    ask links [
+  let current-waypoints-count  0
+
+    ask waypoint 2[
+    repeat 5[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    print current-waypoints
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
       set color red
       set thickness 1
     ]
+        ]
+      ]
+    ]
+    ]
+
+  if (plan = "waittillopen")[
+
+
+    ask waypoint 2[
+    repeat 5[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    print current-waypoints
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+    ]
   ]
+
+
+
 end
 
 to spawn-ships
@@ -376,7 +413,7 @@ CHOOSER
 plan
 plan
 "divert" "waittillopen"
-0
+1
 
 SLIDER
 15
