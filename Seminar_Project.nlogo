@@ -12,6 +12,8 @@ to setup
   set countries-dataset gis:load-dataset "data/countries.shp"
   ; Set the world envelope to the countries dataset's envelope
   gis:set-world-envelope (gis:envelope-of countries-dataset)
+  if freeatday < blockedatday [error "The date blockade can not be after the lifting of blockade"]
+
 
   draw-countries
   spawn-ports
@@ -206,7 +208,7 @@ blockedatday
 blockedatday
 0
 100
-0.0
+46.0
 1
 1
 NIL
@@ -217,8 +219,8 @@ SLIDER
 192
 188
 225
-freedatday
-freedatday
+freeatday
+freeatday
 0
 100
 0.0
