@@ -5,6 +5,7 @@ globals [ countries-dataset
 breed [ country-labels country-label]
 breed [ships ship]
 breed [ports port]
+breed [waypoints waypoint]
 
 to setup
   clear-all
@@ -15,6 +16,7 @@ to setup
 
   draw-countries
   spawn-ports
+  spawn-waypoints
   ;spawn-lanes
   ;spawn-ships
 
@@ -45,6 +47,119 @@ to spawn-ports
     set color pink
   ]
 end
+
+to spawn-waypoints
+  create-waypoints 1 [
+    set xcor 100
+    set ycor 16
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 96
+    set ycor 6
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 88
+    set ycor 10
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 77
+    set ycor 7
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 65
+    set ycor 11
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 50
+    set ycor 15
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 37
+    set ycor 19
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+
+  ;Mediterainian + Suez
+  create-waypoints 1 [
+    set xcor 31
+    set ycor 31
+    set shape "triangle 2"
+    set color yellow
+    set size 5
+  ]
+  create-waypoints 1 [
+    set xcor 19
+    set ycor 33
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 10
+    set ycor 38
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -3
+    set ycor 37
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  ;Africa
+
+
+
+
+
+  ; Coast of Portugal
+  create-waypoints 1 [
+    set xcor -13
+    set ycor 37
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -8
+    set ycor 45
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -1
+    set ycor 48
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+end
+
+
+
 
 to spawn-lanes
   ask ports [
