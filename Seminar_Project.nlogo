@@ -543,6 +543,39 @@ freeatday
 NIL
 HORIZONTAL
 
+SLIDER
+16
+234
+188
+267
+waitmax
+waitmax
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+1285
+12
+1865
+233
+CostIndex
+time
+coast
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles"
+
 @#$#@#$#@
 ## WHAT IS IT?
 
