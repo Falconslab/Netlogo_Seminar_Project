@@ -13,7 +13,7 @@ to setup
   ; Set the world envelope to the countries dataset's envelope
   gis:set-world-envelope (gis:envelope-of countries-dataset)
   if freeatday < blockedatday [error "The blockade needs to happen before it can be lifted"]
-  if maxEarn < minEarn [error "The maximum earne
+  if maxEarn < minEarn [error "The maximum earned Money can not be smaller then the minimum earned money"]
 
   draw-countries
   spawn-ports
@@ -163,7 +163,7 @@ BUTTON
 145
 490
 NIL
-follow-line
+EXECUTE
 NIL
 1
 T
@@ -256,7 +256,7 @@ minEarn
 minEarn
 1
 100
-50.0
+1.0
 1
 1
 NIL
@@ -271,7 +271,7 @@ maxEarn
 maxEarn
 1
 100
-50.0
+1.0
 1
 1
 NIL
