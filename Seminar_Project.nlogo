@@ -12,6 +12,8 @@ globals [ countries-dataset
   blockageLength
 
   waitlength
+
+  cost
 ]
 
 breed [ country-labels country-label]
@@ -38,17 +40,21 @@ to setup
 
 
   ;Temp----
-  set isBlocked  1
+  set isBlocked  0
   set waiting 0
   ;---
 
 
   decide-wait-length
-
+  decide-blockage-length
+  set cost 0
   reset-ticks
 end
 
 to go
+
+  if ((ticks >= blockedatday) and (ticks < freeatday))[set isBlocked 1]
+
 
 
   if isBlocked = 1 [set blockageLength  blockageLength - 1
@@ -56,23 +62,43 @@ to go
       set color red]
     ask waypoint 8[ask my-links[die]
   ]]
-  if blockageLength <= 0 [set isBlocked 0
+  if (blockageLength <= 0 and isBlocked = 1)[set isBlocked 0
    ask waypoint 9[
-      set color yellow]]
+      set color yellow]
+  ask waypoint 8[
+      create-link-with waypoint 7
+      create-link-with waypoint 9
+    [ask links [
+      set color red
+      set thickness 1
+  ]
+      ]
+  ]
+  ]
 
 
 
 
     ask ships[
 
-    ifelse xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 1[
+    if xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 1[
 
       ;do nothing yet
+    ]
+    ifelse xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 0[
+
+      plot-diversion
+      follow-line
+
     ]
     [
       follow-line
     ]
   ]
+  tick
+  set cost cost + costperday
+  tick
+  set cost cost + costperday
 end
 
 
@@ -312,7 +338,7 @@ to spawn-lanes
     ]
     ]
 
-  if (plan = "waittillopen")[
+
 
 
     ask waypoint 2[
@@ -344,40 +370,8 @@ to spawn-lanes
 
     ]
 
-  ]
-   if (plan = "divert")[
-     ask waypoint 2[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (13)
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
-        ]
-      ]
-    ]
 
-    set current-waypoints-count current-waypoints-count + 6
-    ask waypoint 2[
-    repeat 11[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (who + 1 + current-waypoints-count)
-    set current-waypoints-count current-waypoints-count + 1
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
-        ]
-      ]
-    ]
-    ]
-  ]
+
 
    ask waypoint 24[
     set current-waypoints-count 0
@@ -399,6 +393,41 @@ to spawn-lanes
 
 
 end
+
+to plot-diversion
+
+  ask waypoint 10 [ask my-links[die]]
+  ask waypoint 12 [ask my-links[die]]
+
+let current-waypoints-count  0
+
+ask waypoint 7[
+    create-link-with waypoint 13[ask links [
+      set color red
+      set thickness 1
+  ]]]
+
+
+    ask waypoint 13[
+    repeat 11[
+    let current-waypoints  waypoint (who + current-waypoints-count)
+    let next-waypoints waypoint (who + 1 + current-waypoints-count)
+    set current-waypoints-count current-waypoints-count + 1
+     if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+            ask links [
+      set color red
+      set thickness 1
+    ]
+        ]
+      ]
+    ]
+    ]
+
+end
+
+
 
 to connect-ports
   ask port 0[
@@ -436,7 +465,7 @@ to decide-wait-length
 end
 
 to decide-blockage-length
-  set blockageLength blockedatday - freeatday
+  set blockageLength freeatday - blockedatday
 end
 
 
@@ -456,14 +485,14 @@ to follow-line
 
 
     let current-waypoint-cor [ (list xcor ycor)] of waypoints in-radius 3
-    print current-waypoint-cor
+
     let current-waypoint waypoints with [xcor = first item 0 current-waypoint-cor and ycor = last item 0 current-waypoint-cor ]
 
     let curr-waypoint  one-of current-waypoint
-    print curr-waypoint
+
 
     let destination-waypoint-end2 [[ (list xcor ycor)] of end2] of links with [end1 = curr-waypoint]
-    print destination-waypoint-end2
+
 
     let dest-port one-of waypoints with [xcor = first item 0 destination-waypoint-end2 and ycor = last item 0 destination-waypoint-end2 ]
 
@@ -558,16 +587,6 @@ NIL
 NIL
 1
 
-CHOOSER
-33
-56
-171
-101
-plan
-plan
-"divert" "waittillopen"
-1
-
 SLIDER
 15
 110
@@ -577,7 +596,7 @@ costperday
 costperday
 1
 1000000
-1.0
+64001.0
 1000
 1
 NIL
@@ -592,7 +611,7 @@ blockedatday
 blockedatday
 0
 100
-0.0
+2.0
 1
 1
 NIL
@@ -607,7 +626,7 @@ freeatday
 freeatday
 0
 100
-20.0
+8.0
 1
 1
 NIL
@@ -622,7 +641,7 @@ waitmax
 waitmax
 0
 100
-50.0
+0.0
 1
 1
 NIL
@@ -635,7 +654,7 @@ PLOT
 233
 CostIndex
 time
-coast
+cost
 0.0
 10.0
 0.0
@@ -644,7 +663,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles"
+"default" 1.0 0 -16777216 true "" "plot cost"
 
 SLIDER
 19
@@ -655,7 +674,22 @@ waitmin
 waitmin
 0
 100
-50.0
+0.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+68
+187
+101
+POT
+POT
+1
+1000000
+299364.0
 1
 1
 NIL
