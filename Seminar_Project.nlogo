@@ -38,7 +38,7 @@ to setup
 
 
   ;Temp----
-  set isBlocked  0
+  set isBlocked  1
   set waiting 0
   ;---
 
@@ -53,7 +53,9 @@ to go
 
   if isBlocked = 1 [set blockageLength  blockageLength - 1
   ask waypoint 9[
-      set color red]]
+      set color red]
+    ask waypoint 8[ask my-links[die]
+  ]]
   if blockageLength <= 0 [set isBlocked 0
    ask waypoint 9[
       set color yellow]]
@@ -564,7 +566,7 @@ CHOOSER
 plan
 plan
 "divert" "waittillopen"
-0
+1
 
 SLIDER
 15
