@@ -48,6 +48,33 @@ to setup
   reset-ticks
 end
 
+to go
+
+
+  if isBlocked = 1 [set blockageLength  blockageLength - 1
+  ask waypoint 9[
+      set color red]]
+  if blockageLength <= 0 [set isBlocked 0
+   ask waypoint 9[
+      set color yellow]]
+
+
+
+
+    ask ships[
+
+    ifelse xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 1[
+
+      ;do nothing yet
+    ]
+    [
+      follow-line
+    ]
+  ]
+end
+
+
+
 ; Draw the multi-polygon countries dataset to the drawing layer
 to draw-countries
   gis:set-drawing-color green
@@ -417,14 +444,15 @@ to check-blockage-counter
 end
 
 
+
+
+
+
 to follow-line
 
   ask ships[
 
-    ifelse xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 1[
-      ;do nothing yet
-    ]
-    [
+
     let current-waypoint-cor [ (list xcor ycor)] of waypoints in-radius 3
     print current-waypoint-cor
     let current-waypoint waypoints with [xcor = first item 0 current-waypoint-cor and ycor = last item 0 current-waypoint-cor ]
@@ -440,7 +468,7 @@ to follow-line
     move-to dest-port
     ]
 
-  ]
+
 end
 
 
@@ -517,7 +545,7 @@ BUTTON
 145
 490
 NIL
-follow-line
+go
 NIL
 1
 T
@@ -577,7 +605,7 @@ freeatday
 freeatday
 0
 100
-0.0
+20.0
 1
 1
 NIL
