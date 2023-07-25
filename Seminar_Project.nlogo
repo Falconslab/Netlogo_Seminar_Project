@@ -19,6 +19,8 @@ breed [ships ship]
 breed [ports port]
 breed [waypoints waypoint]
 
+ships-own[Arrived?]
+
 to setup
   clear-all
   ; Load the countries dataset
@@ -38,7 +40,7 @@ to setup
 
 
   ;Temp----
-  set isBlocked  1
+  set isBlocked  0
   set waiting 0
   ;---
 
@@ -73,6 +75,9 @@ to go
       follow-line
     ]
   ]
+
+
+  check-if-arrived
 end
 
 
@@ -423,8 +428,8 @@ end
 
 to spawn-ships
   create-ships 1[
-    set xcor 100
-    set ycor 16
+    set xcor 99
+    set ycor 22
     set shape "containership"
     set size 10
 
@@ -454,24 +459,50 @@ to follow-line
 
   ask ships[
 
+    ifelse xcor = 99 and ycor = 22 [
+        move-to waypoint 2
+     ][
 
     let current-waypoint-cor [ (list xcor ycor)] of waypoints in-radius 3
-    print current-waypoint-cor
+
     let current-waypoint waypoints with [xcor = first item 0 current-waypoint-cor and ycor = last item 0 current-waypoint-cor ]
 
     let curr-waypoint  one-of current-waypoint
-    print curr-waypoint
 
     let destination-waypoint-end2 [[ (list xcor ycor)] of end2] of links with [end1 = curr-waypoint]
-    print destination-waypoint-end2
 
-    let dest-port one-of waypoints with [xcor = first item 0 destination-waypoint-end2 and ycor = last item 0 destination-waypoint-end2 ]
-
-    move-to dest-port
+    ifelse destination-waypoint-end2 = [] [
+      ifelse xcor = -1 and ycor = 48 [
+          move-to port 0
+          set Arrived? true
+        ]
+        [
+          error "No available Waypoint!"
+        ]
+      ]
+      [
+        let dest-port one-of waypoints with [xcor = first item 0 destination-waypoint-end2 and ycor = last item 0 destination-waypoint-end2 ]
+        move-to dest-port
+      ]
     ]
+
+  ]
 
 
 end
+
+to check-if-arrived
+  ask ships[
+    if Arrived? = true[
+      ;Do Money Stuff
+      move-to port 1
+    ]
+    set Arrived? false
+  ]
+
+end
+
+
 
 
 to draw/clear-country-labels
@@ -566,7 +597,7 @@ CHOOSER
 plan
 plan
 "divert" "waittillopen"
-1
+0
 
 SLIDER
 15
