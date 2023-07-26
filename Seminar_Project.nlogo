@@ -1,18 +1,11 @@
 extensions [ gis ]
-globals [ countries-dataset
-          should-draw-country-labels
-
-  ; 0 = Open 1 = Blocked
+globals [ 
+  countries-dataset
+  should-draw-country-labels
   isBlocked
-
-  ;0 = not waiting 1= waiting
-  ;
   waiting
-
   blockageLength
-
   waitlength
-
   cost
 ]
 
@@ -30,8 +23,9 @@ to setup
   ;set cities-dataset gis:load-dataset "data/cities.shp"
   ; Set the world envelope to the countries dataset's envelope
   gis:set-world-envelope (gis:envelope-of countries-dataset)
-  if freeatday < blockedatday [error "The blockade needs to happen before it can be lifted"]
-
+  if freeatday < blockedatday [
+    error "The blockade needs to happen before it can be lifted"
+    ]
 
   draw-countries
   spawn-ports
@@ -39,64 +33,60 @@ to setup
   spawn-lanes
   connect-ports
   spawn-ships
-
-
-  ;Temp----
   set isBlocked  0
   set waiting 0
-  ;---
-
 
   decide-wait-length
   decide-blockage-length
   set cost 0
   reset-ticks
+
 end
 
 to go
 
-  if ((ticks >= blockedatday) and (ticks < freeatday))[set isBlocked 1]
+  if ((ticks >= blockedatday) and (ticks < freeatday))[
+    set isBlocked 1
+    ]
 
+  if isBlocked = 1 [
+    set blockageLength  blockageLength - 1
+    ask waypoint 9[
+      set color red
+      ]
+    ask waypoint 8[
+      ask my-links[die]
+    ]
+  ]
 
-
-  if isBlocked = 1 [set blockageLength  blockageLength - 1
-  ask waypoint 9[
-      set color red]
-    ask waypoint 8[ask my-links[die]
-  ]]
-  if (blockageLength <= 0 and isBlocked = 1)[set isBlocked 0
-   ask waypoint 9[
-      set color yellow]
+  if (blockageLength <= 0 and isBlocked = 1)[
+    set isBlocked 0
+    ask waypoint 9[
+      set color yellow
+      ]
   ask waypoint 8[
-      create-link-with waypoint 7
-      create-link-with waypoint 9
-    [ask links [
+    create-link-with waypoint 7
+    create-link-with waypoint 9[
+      ask links [
       set color red
       set thickness 1
-  ]
       ]
+    ]
+    ]
   ]
-  ]
-
-
 
 
     ask ships[
-
-    if xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 1[
-
-      ;do nothing yet
+      if xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 1[
+      ]
+      ifelse xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 0[
+        plot-diversion
+        follow-line
+      ]
+      [
+        follow-line
+      ]
     ]
-    ifelse xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 0[
-
-      plot-diversion
-      follow-line
-
-    ]
-    [
-      follow-line
-    ]
-  ]
   tick
   set cost cost + costperday
   tick
@@ -323,76 +313,75 @@ end
 to spawn-lanes
   let current-waypoints-count  0
 
-    ask waypoint 2[
+  ask waypoint 2[
     repeat 5[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (who + 1 + current-waypoints-count)
-    set current-waypoints-count current-waypoints-count + 1
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
+      let current-waypoints  waypoint (who + current-waypoints-count)
+      let next-waypoints waypoint (who + 1 + current-waypoints-count)
+      set current-waypoints-count current-waypoints-count + 1
+      if is-turtle? next-waypoints [
+        ask current-waypoints [
+          create-link-with next-waypoints
+          ask links [
+            set color red
+            set thickness 1
+          ]
         ]
-      ]
+      ] 
     ]
-    ]
+  ]
 
 
 
 
-    ask waypoint 2[
+  ask waypoint 2[
     repeat 5[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (who + 1 + current-waypoints-count)
-    set current-waypoints-count current-waypoints-count + 1
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
+      let current-waypoints  waypoint (who + current-waypoints-count)
+      let next-waypoints waypoint (who + 1 + current-waypoints-count)
+      set current-waypoints-count current-waypoints-count + 1
+      if is-turtle? next-waypoints [
+        ask current-waypoints [
+          create-link-with next-waypoints
+          ask links [
+            set color red
+            set thickness 1
+          ]
         ]
       ]
     ]
-      let current-waypoints waypoint (12)
-      let next-waypoints waypoint (24)
-       if is-turtle? next-waypoints [
+
+    let current-waypoints waypoint (12)
+    let next-waypoints waypoint (24)
+    if is-turtle? next-waypoints [
       ask current-waypoints [
         create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
-        ]
-      ]
-
-    ]
-
-
-
-
-   ask waypoint 24[
-    set current-waypoints-count 0
-    repeat 3[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (who + 1 + current-waypoints-count)
-    set current-waypoints-count current-waypoints-count + 1
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
+        ask links [
+          set color red
+          set thickness 1
         ]
       ]
     ]
   ]
 
+
+
+
+  ask waypoint 24[
+    set current-waypoints-count 0
+    repeat 3[
+      let current-waypoints  waypoint (who + current-waypoints-count)
+      let next-waypoints waypoint (who + 1 + current-waypoints-count)
+      set current-waypoints-count current-waypoints-count + 1
+      if is-turtle? next-waypoints [
+        ask current-waypoints [
+          create-link-with next-waypoints
+          ask links [
+            set color red
+            set thickness 1
+          ]
+        ]
+      ]
+    ]
+  ]
 
 end
 
@@ -401,31 +390,34 @@ to plot-diversion
   ask waypoint 10 [ask my-links[die]]
   ask waypoint 12 [ask my-links[die]]
 
-let current-waypoints-count  0
+  let current-waypoints-count  0
 
-ask waypoint 7[
-    create-link-with waypoint 13[ask links [
-      set color red
-      set thickness 1
-  ]]]
-
-
-    ask waypoint 13[
-    repeat 11[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (who + 1 + current-waypoints-count)
-    set current-waypoints-count current-waypoints-count + 1
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
+  ask waypoint 7[
+    create-link-with waypoint 13[
+      ask links [
+        set color red
+        set thickness 1
+      ]
     ]
+  ]
+
+
+  ask waypoint 13[
+    repeat 11[
+      let current-waypoints  waypoint (who + current-waypoints-count)
+      let next-waypoints waypoint (who + 1 + current-waypoints-count)
+      set current-waypoints-count current-waypoints-count + 1
+      if is-turtle? next-waypoints [
+        ask current-waypoints [
+          create-link-with next-waypoints
+          ask links [
+            set color red
+            set thickness 1
+            ]
         ]
       ]
     ]
-    ]
+  ]
 
 end
 
@@ -434,16 +426,16 @@ end
 to connect-ports
   ask port 0[
     create-link-with waypoint 26
-            ask links [
-      set color red
-      set thickness 1
+      ask links [
+        set color red
+        set thickness 1
+      ]
     ]
-  ]
 
 
-    ask port 1[
+  ask port 1[
     create-link-with waypoint 2
-            ask links [
+    ask links [
       set color red
       set thickness 1
     ]
@@ -486,17 +478,13 @@ to follow-line
   ask ships[
 
     ifelse xcor = 99 and ycor = 22 [
-        move-to waypoint 2
-     ][
-
+      move-to waypoint 2
+    ]
+    [
     let current-waypoint-cor [ (list xcor ycor)] of waypoints in-radius 3
-
     let current-waypoint waypoints with [xcor = first item 0 current-waypoint-cor and ycor = last item 0 current-waypoint-cor ]
-
     let curr-waypoint  one-of current-waypoint
-
     let destination-waypoint-end2 [[ (list xcor ycor)] of end2] of links with [end1 = curr-waypoint]
-
     ifelse destination-waypoint-end2 = [] [
       ifelse xcor = -1 and ycor = 48 [
           move-to port 0
