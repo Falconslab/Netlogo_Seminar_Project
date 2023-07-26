@@ -1,5 +1,5 @@
 extensions [ gis ]
-globals [ 
+globals [
   countries-dataset
   should-draw-country-labels
   isBlocked
@@ -91,6 +91,8 @@ to go
   set cost cost + costperday
   tick
   set cost cost + costperday
+
+  check-if-arrived
 end
 
 
@@ -326,7 +328,7 @@ to spawn-lanes
             set thickness 1
           ]
         ]
-      ] 
+      ]
     ]
   ]
 
