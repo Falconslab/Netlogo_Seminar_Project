@@ -8,14 +8,13 @@ globals [
   waitlength
   cost
   diverted
+  Arrived?
 ]
 
 breed [country-labels country-label]
 breed [ships ship]
 breed [ports port]
 breed [waypoints waypoint]
-
-ships-own[Arrived?]
 
 to setup
   clear-all
@@ -516,16 +515,17 @@ to follow-line
 end
 
 to check-if-arrived
-  ask ships[
     if Arrived? = true[
       ;Do Money Stuff
+
+    Ask ships[
       move-to port 1
     ]
+    reset-ticks
     set Arrived? false
   ]
 
 end
-
 
 
 
