@@ -7,9 +7,10 @@ globals [
   blockageLength
   waitlength
   cost
+  diverted
 ]
 
-breed [ country-labels country-label]
+breed [country-labels country-label]
 breed [ships ship]
 breed [ports port]
 breed [waypoints waypoint]
@@ -35,6 +36,7 @@ to setup
   spawn-ships
   set isBlocked  0
   set waiting 0
+  set diverted 0
 
   decide-wait-length
   decide-blockage-length
@@ -44,10 +46,32 @@ to setup
 end
 
 to go
+  tick
+  set cost cost + costperday
+  tick
+  set cost cost + costperday
 
-  if ((ticks >= blockedatday) and (ticks < freeatday))[
+  ifelse ((ticks >= blockedatday) and (ticks < freeatday))[
     set isBlocked 1
     ]
+  [
+        set isBlocked 0
+    ask waypoint 9[
+      set color yellow
+      ]
+    if(diverted = 0)[
+      ask waypoint 8[
+        create-link-with waypoint 7
+        create-link-with waypoint 9[
+          ask links [
+            set color red
+            set thickness 1
+          ]
+        ]
+      ]
+    ]
+   ]
+
 
   if isBlocked = 1 [
     set blockageLength  blockageLength - 1
@@ -59,21 +83,8 @@ to go
     ]
   ]
 
-  if (blockageLength <= 0 and isBlocked = 1)[
-    set isBlocked 0
-    ask waypoint 9[
-      set color yellow
-      ]
-  ask waypoint 8[
-    create-link-with waypoint 7
-    create-link-with waypoint 9[
-      ask links [
-      set color red
-      set thickness 1
-      ]
-    ]
-    ]
-  ]
+
+
 
 
     ask ships[
@@ -87,10 +98,7 @@ to go
         follow-line
       ]
     ]
-  tick
-  set cost cost + costperday
-  tick
-  set cost cost + costperday
+
 
   check-if-arrived
 end
@@ -388,7 +396,7 @@ to spawn-lanes
 end
 
 to plot-diversion
-
+  set diverted 1
   ask waypoint 10 [ask my-links[die]]
   ask waypoint 12 [ask my-links[die]]
 
@@ -629,7 +637,7 @@ blockedatday
 blockedatday
 0
 100
-2.0
+5.0
 1
 1
 NIL
@@ -644,7 +652,7 @@ freeatday
 freeatday
 0
 100
-8.0
+15.0
 1
 1
 NIL
