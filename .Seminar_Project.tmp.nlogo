@@ -1,39 +1,150 @@
 extensions [ gis ]
-globals [ countries-dataset
-          should-draw-country-labels ]
+globals [
+  countries-dataset
+  should-draw-country-labels
+  isBlocked
+  waiting
+  blockageLength
+  waitlength
+  cost
+  cost2
+  diverted
+  Arrived?
+  passcount
+]
 
-breed [ country-labels country-label]
+breed [country-labels country-label]
 breed [ships ship]
 breed [ports port]
+breed [waypoints waypoint]
 
 to setup
   clear-all
   ; Load the countries dataset
   set countries-dataset gis:load-dataset "data/countries.shp"
+  ;set cities-dataset gis:load-dataset "data/cities.shp"
   ; Set the world envelope to the countries dataset's envelope
   gis:set-world-envelope (gis:envelope-of countries-dataset)
-  if freeatday < blockedatday [error "The blockade needs to happen before it can be lifted"]
-  if maxEarn < minEarn [error "The maximum earned Money can not be smaller then the minimum earned money"]
+  if freeatday < blockedatday [
+    error "The blockade needs to happen before it can be lifted"
+    ]
 
   draw-countries
   spawn-ports
-<<<<<<< Updated upstream
-  ;spawn-lanes
-=======
   spawn-waypoints
   spawn-lanes
   connect-ports
->>>>>>> Stashed changes
-  ;spawn-ships
+  spawn-ships
+  set isBlocked  0
+  set waiting 0
+  set diverted 0
+  set passcount 0
 
+  decide-wait-length
+  decide-blockage-length
+  set cost 0
+  set cost2 0
+
+  clear-all-plots
+  set-current-plot "CostIndex 2"
+  plot-pen-up
+  set-current-plot "Costindex"
 
   reset-ticks
+
 end
+
+to go
+  if passcount = 2[
+    stop
+  ]
+  if passcount = 99[
+    ;has to be here because the plot on the Dashboard only updates AFTER all procedures have run! Changing a value mid run is not plotted! Why do even bother with multithreading?
+    plot-pen-up
+    set-current-plot "CostIndex 2"
+    plot-pen-down
+    clear-plot
+    set passcount 1
+  ]
+  tick
+  if passcount = 0[
+    set cost cost + costperday
+  ]
+    if passcount = 1[
+    set cost2 cost2 + costperday
+  ]
+  tick
+    if passcount = 0[
+    set cost cost + costperday
+  ]
+    if passcount = 1[
+    set cost2 cost2 + costperday
+  ]
+
+  ifelse ((ticks >= blockedatday) and (ticks < freeatday))[
+    set isBlocked 1
+    ]
+  [
+        set isBlocked 0
+    ask waypoint 9[
+      set color yellow
+      ]
+    if(diverted = 0)[
+      ask waypoint 8[
+        create-link-with waypoint 7
+        create-link-with waypoint 9[
+          ask links [
+            set color red
+            set thickness 1
+          ]
+        ]
+      ]
+    ]
+   ]
+
+
+  if isBlocked = 1 [
+    set blockageLength  blockageLength - 1
+    ask waypoint 9[
+      set color red
+      ]
+    ask waypoint 8[
+      ask my-links[die]
+    ]
+  ]
+
+
+
+
+
+    ask ships[
+      if xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 1[
+         set waitlength waitlength - 2
+         if waitlength <= 0[
+           set waiting 0
+         ]
+         stop
+      ]
+      ifelse xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 0[
+        plot-diversion
+        follow-line
+      ]
+      [
+        follow-line
+      ]
+    ]
+
+
+  check-if-arrived
+end
+
+
 
 ; Draw the multi-polygon countries dataset to the drawing layer
 to draw-countries
   gis:set-drawing-color green
   gis:draw countries-dataset 1
+  ;gis:draw
 end
 
 to spawn-ports
@@ -54,170 +165,442 @@ to spawn-ports
   ]
 end
 
+to spawn-waypoints
+  ;China to Eritrea
+  create-waypoints 1 [
+    set xcor 100
+    set ycor 16
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 96
+    set ycor 6
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 88
+    set ycor 10
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 77
+    set ycor 7
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 65
+    set ycor 11
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 50
+    set ycor 15
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 37
+    set ycor 19
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+
+  ;Suez to Gibralta
+  create-waypoints 1 [
+    set xcor 31
+    set ycor 31
+    set shape "triangle 2"
+    set color yellow
+    set size 5
+  ]
+  create-waypoints 1 [
+    set xcor 19
+    set ycor 33
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 10
+    set ycor 38
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -3
+    set ycor 37
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+
+  ;Africa to Portugal
+  create-waypoints 1 [
+    set xcor 44
+    set ycor 5
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 38
+    set ycor -4
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 37
+    set ycor -12
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 34
+    set ycor -18
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 28
+    set ycor -26
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 19
+    set ycor -29
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor 10
+    set ycor -21
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]create-waypoints 1 [
+    set xcor -3
+    set ycor -13
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -13
+    set ycor -1
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -18
+    set ycor 12
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -18
+    set ycor 25
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+
+
+
+
+  ; Coast of Portugal
+  create-waypoints 1 [
+    set xcor -13
+    set ycor 37
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -8
+    set ycor 45
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+  create-waypoints 1 [
+    set xcor -1
+    set ycor 48
+    set shape "flag"
+    set color yellow
+    set size 3
+  ]
+end
+
+
+
+
 to spawn-lanes
-<<<<<<< Updated upstream
-  ask ports [
-    create-links-with other turtles
+  let current-waypoints-count  0
+
+  ask waypoint 2[
+    repeat 5[
+      let current-waypoints  waypoint (who + current-waypoints-count)
+      let next-waypoints waypoint (who + 1 + current-waypoints-count)
+      set current-waypoints-count current-waypoints-count + 1
+      if is-turtle? next-waypoints [
+        ask current-waypoints [
+          create-link-with next-waypoints
+          ask links [
+            set color red
+            set thickness 1
+          ]
+        ]
+      ]
+    ]
+  ]
+
+
+
+
+  ask waypoint 2[
+    repeat 5[
+      let current-waypoints  waypoint (who + current-waypoints-count)
+      let next-waypoints waypoint (who + 1 + current-waypoints-count)
+      set current-waypoints-count current-waypoints-count + 1
+      if is-turtle? next-waypoints [
+        ask current-waypoints [
+          create-link-with next-waypoints
+          ask links [
+            set color red
+            set thickness 1
+          ]
+        ]
+      ]
+    ]
+
+    let current-waypoints waypoint (12)
+    let next-waypoints waypoint (24)
+    if is-turtle? next-waypoints [
+      ask current-waypoints [
+        create-link-with next-waypoints
+        ask links [
+          set color red
+          set thickness 1
+        ]
+      ]
+    ]
+  ]
+
+
+
+
+  ask waypoint 24[
+    set current-waypoints-count 0
+    repeat 3[
+      let current-waypoints  waypoint (who + current-waypoints-count)
+      let next-waypoints waypoint (who + 1 + current-waypoints-count)
+      set current-waypoints-count current-waypoints-count + 1
+      if is-turtle? next-waypoints [
+        ask current-waypoints [
+          create-link-with next-waypoints
+          ask links [
+            set color red
+            set thickness 1
+          ]
+        ]
+      ]
+    ]
+  ]
+
+end
+
+to plot-diversion
+  set diverted 1
+  ask waypoint 10 [ask my-links[die]]
+  ask waypoint 12 [ask my-links[die]]
+
+  let current-waypoints-count  0
+
+  ask waypoint 7[
+    create-link-with waypoint 13[
+      ask links [
+        set color red
+        set thickness 1
+      ]
+    ]
+  ]
+
+
+  ask waypoint 13[
+    repeat 11[
+      let current-waypoints  waypoint (who + current-waypoints-count)
+      let next-waypoints waypoint (who + 1 + current-waypoints-count)
+      set current-waypoints-count current-waypoints-count + 1
+      if is-turtle? next-waypoints [
+        ask current-waypoints [
+          create-link-with next-waypoints
+          ask links [
+            set color red
+            set thickness 1
+            ]
+        ]
+      ]
+    ]
+  ]
+
+end
+
+
+
+
+
+
+
+to connect-ports
+  ask port 0[
+    create-link-with waypoint 26
+      ask links [
+        set color red
+        set thickness 1
+      ]
+    ]
+
+
+  ask port 1[
+    create-link-with waypoint 2
     ask links [
       set color red
       set thickness 1
     ]
   ]
-=======
-  let current-waypoints-count  0
-
-    ask waypoint 2[
-    repeat 5[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (who + 1 + current-waypoints-count)
-    set current-waypoints-count current-waypoints-count + 1
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
-        ]
-      ]
-    ]
-    ]
-
-  if (plan = "waittillopen")[
-
-
-    ask waypoint 2[
-    repeat 5[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (who + 1 + current-waypoints-count)
-    set current-waypoints-count current-waypoints-count + 1
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
-        ]
-      ]
-    ]
-      let current-waypoints waypoint (12)
-      let next-waypoints waypoint (24)
-       if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
-        ]
-      ]
-
-    ]
-
-  ]
-   if (plan = "divert")[
-     ask waypoint 2[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (13)
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
-        ]
-      ]
-    ]
-
-    set current-waypoints-count current-waypoints-count + 6
-    ask waypoint 2[
-    repeat 11[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (who + 1 + current-waypoints-count)
-    set current-waypoints-count current-waypoints-count + 1
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
-        ]
-      ]
-    ]
-    ]
-  ]
-
-   ask waypoint 24[
-    set current-waypoints-count 0
-    repeat 3[
-    let current-waypoints  waypoint (who + current-waypoints-count)
-    let next-waypoints waypoint (who + 1 + current-waypoints-count)
-    set current-waypoints-count current-waypoints-count + 1
-     if is-turtle? next-waypoints [
-      ask current-waypoints [
-        create-link-with next-waypoints
-            ask links [
-      set color red
-      set thickness 1
-    ]
-        ]
-      ]
-    ]
-  ]
-
-
->>>>>>> Stashed changes
-end
-
-to connect-ports
-  ask port 0[
-    create-link-with way
-            ask links [
-      set color red
-      set thickness 1
-    ]
-  ]
 
 
 end
-
-
-
-
 
 to spawn-ships
   create-ships 1[
-    set xcor -70
-    set ycor 33
-    set shape "sailboat side"
+    set xcor 99
+    set ycor 22
+    set shape "containership"
     set size 10
-    set color red
+
   ]
 end
 
+to decide-wait-length
+  set waitlength waitmin + (random (waitmax - waitmin))
+end
+
+to decide-blockage-length
+  set blockageLength freeatday - blockedatday
+end
+
+
+to check-blockage-counter
+
+
+end
+
+
+
+
+
+
 to follow-line
+
   ask ships[
-    let current-port-cor [ (list xcor ycor)] of ports in-radius 5
-    let current-port ports with [xcor = first item 0 current-port-cor and ycor = last item 0 current-port-cor ]
-    print current-port
-   ;let destination-port [other-end] of links with [end2 = current-port or end1 = current-port]
-    ask current-port[
-      ask one-of my-links [
-        ; irgendwie turtles own oder glubul
-        let x other-end
+
+    ifelse xcor = 99 and ycor = 22 [
+      move-to waypoint 2
+    ]
+    [
+    let current-waypoint-cor [ (list xcor ycor)] of waypoints in-radius 3
+    let current-waypoint waypoints with [xcor = first item 0 current-waypoint-cor and ycor = last item 0 current-waypoint-cor ]
+    let curr-waypoint  one-of current-waypoint
+    let destination-waypoint-end2 [[ (list xcor ycor)] of end2] of links with [end1 = curr-waypoint]
+    ifelse destination-waypoint-end2 = [] [
+      ifelse xcor = -1 and ycor = 48 [
+          move-to port 0
+          set Arrived? true
+        ]
+        [
+          error "No available Waypoint!"
+        ]
+      ]
+      [
+        let dest-port one-of waypoints with [xcor = first item 0 destination-waypoint-end2 and ycor = last item 0 destination-waypoint-end2 ]
+        move-to dest-port
       ]
     ]
 
-    ;print x
-   ; print destination-port
+  ]
 
-    ;move-to item 1 destination-port-cor
+
+end
+
+to check-if-arrived
+    if Arrived? = true[
+      ;Do Money Stuff
+    Ask ships[
+      die
+    ]
+    reset-ticks
+    set Arrived? false
+    set diverted 0
+    let waypointcount 2
+    repeat 25[
+      ask waypoint waypointcount[
+        ask my-links[
+          die
+        ]
+      ]
+      set waypointcount waypointcount + 1
+    ]
+    spawn-lanes
+    ;Ask ships[
+     ; die
+    ;]
+    spawn-ships
+    connect-ports
+
+    set isBlocked  0
+    set waiting 0
+    set diverted 0
+
+
+    decide-wait-length
+    decide-blockage-length
+
+    ifelse(passcount = 0)[
+      set cost cost - POT
+      update-plots
+      set passcount 99
+    ]
+    [
+      set cost2 cost2 - POT
+      update-plots
+      set passcount 2
+    ]
 
   ]
 end
+
 
 
 to draw/clear-country-labels
@@ -293,7 +676,7 @@ BUTTON
 145
 490
 NIL
-EXECUTE
+go
 NIL
 1
 T
@@ -304,16 +687,6 @@ NIL
 NIL
 1
 
-CHOOSER
-33
-56
-171
-101
-plan
-plan
-"divert" "waittillopen"
-0
-
 SLIDER
 15
 110
@@ -323,7 +696,7 @@ costperday
 costperday
 1
 1000000
-1.0
+64001.0
 1000
 1
 NIL
@@ -359,13 +732,28 @@ freeatday
 NIL
 HORIZONTAL
 
+SLIDER
+16
+234
+188
+267
+waitmax
+waitmax
+0
+100
+24.0
+1
+1
+NIL
+HORIZONTAL
+
 PLOT
-1294
-10
-1494
-160
-plot 1
-trip duration
+1285
+12
+1865
+233
+CostIndex
+time
 cost
 0.0
 10.0
@@ -375,37 +763,55 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles"
+"default" 1.0 0 -16777216 true "" "plot cost"
 
 SLIDER
-17
-235
-189
-268
-minEarn
-minEarn
-1
+19
+282
+191
+315
+waitmin
+waitmin
+0
 100
-1.0
+0.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-17
-275
-189
-308
-maxEarn
-maxEarn
+15
+68
+187
+101
+POT
+POT
 1
-100
-1.0
+1000000
+299364.0
 1
 1
 NIL
 HORIZONTAL
+
+PLOT
+1285
+245
+1864
+464
+CostIndex 2
+time
+cost
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot cost2"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -512,35 +918,35 @@ Circle -7500403 true true 0 0 300
 Circle -16777216 true false 30 30 240
 
 containership
-true
-0
-Rectangle -13840069 true false 150 180 240 210
-Rectangle -7500403 true true 60 270 75 285
-Rectangle -7500403 true true 45 255 60 270
-Rectangle -7500403 true true 30 240 45 255
-Rectangle -7500403 true true 75 270 240 285
-Rectangle -7500403 true true 240 255 255 270
-Rectangle -7500403 true true 255 240 270 255
-Rectangle -7500403 true true 30 210 45 240
-Rectangle -7500403 true true 255 210 270 240
-Rectangle -7500403 true true 45 210 255 225
-Rectangle -7500403 true true 45 135 60 210
-Rectangle -7500403 true true 60 135 105 150
-Rectangle -7500403 true true 90 150 105 210
-Rectangle -11221820 true false 75 150 90 165
-Rectangle -11221820 true false 75 165 90 180
-Rectangle -7500403 true true 60 150 75 210
-Rectangle -7500403 true true 75 195 90 210
-Rectangle -7500403 true true 75 180 90 195
-Rectangle -7500403 true true 210 195 270 210
-Rectangle -7500403 true true 225 180 270 195
-Rectangle -2674135 true false 150 150 240 180
-Rectangle -10899396 true false 45 240 120 255
-Rectangle -7500403 true true 45 225 255 240
-Rectangle -7500403 true true 120 240 255 255
-Rectangle -7500403 true true 60 255 240 270
-Rectangle -1 true false 150 180 180 195
-Rectangle -1184463 true false 150 150 180 165
+false
+9
+Rectangle -13840069 true false 60 180 150 210
+Rectangle -7500403 true false 225 270 240 285
+Rectangle -7500403 true false 240 255 255 270
+Rectangle -7500403 true false 255 240 270 255
+Rectangle -7500403 true false 60 270 225 285
+Rectangle -7500403 true false 45 255 60 270
+Rectangle -7500403 true false 30 240 45 255
+Rectangle -7500403 true false 255 210 270 240
+Rectangle -7500403 true false 30 210 45 240
+Rectangle -7500403 true false 45 210 255 225
+Rectangle -7500403 true false 240 135 255 210
+Rectangle -7500403 true false 195 135 240 150
+Rectangle -7500403 true false 195 150 210 210
+Rectangle -11221820 true false 210 150 225 165
+Rectangle -11221820 true false 210 165 225 180
+Rectangle -7500403 true false 225 150 240 210
+Rectangle -7500403 true false 210 195 225 210
+Rectangle -7500403 true false 210 180 225 195
+Rectangle -7500403 true false 30 195 90 210
+Rectangle -7500403 true false 30 180 75 195
+Rectangle -2674135 true false 60 150 150 180
+Rectangle -10899396 true false 180 240 255 255
+Rectangle -7500403 true false 45 225 255 240
+Rectangle -7500403 true false 45 240 180 255
+Rectangle -7500403 true false 60 255 240 270
+Rectangle -1 true false 120 180 150 195
+Rectangle -1184463 true false 120 150 150 165
 
 cow
 false
