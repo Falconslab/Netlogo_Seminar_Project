@@ -7,8 +7,10 @@ globals [
   blockageLength
   waitlength
   cost
+  cost2
   diverted
   Arrived?
+  passcount
 ]
 
 breed [country-labels country-label]
@@ -36,19 +38,48 @@ to setup
   set isBlocked  0
   set waiting 0
   set diverted 0
+  set passcount 0
 
   decide-wait-length
   decide-blockage-length
   set cost 0
+  set cost2 0
+
+  clear-all-plots
+  set-current-plot "CostIndex 2"
+  plot-pen-up
+  set-current-plot "Costindex"
+
   reset-ticks
 
 end
 
 to go
+  if passcount = 2[
+    stop
+  ]
+  if passcount = 99[
+    ;has to be here because the plot on the Dashboard only updates AFTER all procedures have run! Changing a value mid run is not plotted! Why do even bother with multithreading?
+    plot-pen-up
+    set-current-plot "CostIndex 2"
+    plot-pen-down
+    clear-plot
+    set passcount 1
+  ]
   tick
-  set cost cost + costperday
+  if passcount = 0[
+    set cost cost + costperday
+  ]
+    if passcount = 1[
+    set cost2 cost2 + costperday
+  ]
   tick
-  set cost cost + costperday
+    if passcount = 0[
+    set cost cost + costperday
+  ]
+    if passcount = 1[
+    set cost2 cost2 + costperday
+  ]
 
   ifelse ((ticks >= blockedatday) and (ticks < freeatday))[
     set isBlocked 1
@@ -88,6 +119,11 @@ to go
 
     ask ships[
       if xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 1[
+         set waitlength waitlength - 2
+         if waitlength <= 0[
+           set waiting 0
+         ]
+         stop
       ]
       ifelse xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 0[
         plot-diversion
@@ -432,6 +468,10 @@ end
 
 
 
+
+
+
+
 to connect-ports
   ask port 0[
     create-link-with waypoint 26
@@ -469,6 +509,7 @@ end
 
 to decide-blockage-length
   set blockageLength freeatday - blockedatday
+  set waiting 1
 end
 
 
@@ -517,15 +558,50 @@ end
 to check-if-arrived
     if Arrived? = true[
       ;Do Money Stuff
-
     Ask ships[
-      move-to port 1
+      die
     ]
     reset-ticks
     set Arrived? false
-  ]
+    set diverted 0
+    let waypointcount 2
+    repeat 25[
+      ask waypoint waypointcount[
+        ask my-links[
+          die
+        ]
+      ]
+      set waypointcount waypointcount + 1
+    ]
+    spawn-lanes
+    ;Ask ships[
+     ; die
+    ;]
+    spawn-ships
+    connect-ports
 
+    set isBlocked  0
+    set waiting 0
+    set diverted 0
+
+
+    decide-wait-length
+    decide-blockage-length
+
+    ifelse(passcount = 0)[
+      set cost cost - POT
+      update-plots
+      set passcount 99
+    ]
+    [
+      set cost2 cost2 - POT
+      update-plots
+      set passcount 2
+    ]
+
+  ]
 end
+
 
 
 
@@ -637,7 +713,7 @@ blockedatday
 blockedatday
 0
 100
-5.0
+0.0
 1
 1
 NIL
@@ -652,7 +728,7 @@ freeatday
 freeatday
 0
 100
-15.0
+61.0
 1
 1
 NIL
@@ -667,7 +743,7 @@ waitmax
 waitmax
 0
 100
-0.0
+24.0
 1
 1
 NIL
@@ -720,6 +796,24 @@ POT
 1
 NIL
 HORIZONTAL
+
+PLOT
+1285
+245
+1864
+464
+CostIndex 2
+time
+cost
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot cost2"
 
 @#$#@#$#@
 ## WHAT IS IT?
