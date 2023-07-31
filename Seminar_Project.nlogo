@@ -28,6 +28,9 @@ to setup
   if freeatday < blockedatday [
     error "The blockade needs to happen before it can be lifted"
     ]
+  if blockedatday = 16 or blockedatday = 15 [
+    error "The blockage cant be happening while the vessle is in the canal"
+  ]
 
   draw-countries
   spawn-ports
@@ -713,7 +716,7 @@ blockedatday
 blockedatday
 0
 100
-0.0
+14.0
 1
 1
 NIL
@@ -728,7 +731,7 @@ freeatday
 freeatday
 0
 100
-61.0
+100.0
 1
 1
 NIL
