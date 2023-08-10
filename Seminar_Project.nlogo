@@ -67,21 +67,27 @@ to go
     set-current-plot "CostIndex 2"
     plot-pen-down
     clear-plot
+    update-plots
     set passcount 1
   ]
-  tick
+
+
   if passcount = 0[
     set cost cost + costperday
+    tick
   ]
     if passcount = 1[
     set cost2 cost2 + costperday
+    tick
   ]
-  tick
+
     if passcount = 0[
     set cost cost + costperday
+    tick
   ]
     if passcount = 1[
     set cost2 cost2 + costperday
+    tick
   ]
 
   ifelse ((ticks >= blockedatday) and (ticks < freeatday))[
@@ -731,7 +737,7 @@ freeatday
 freeatday
 0
 100
-0.0
+20.0
 1
 1
 NIL
@@ -746,7 +752,7 @@ waitmax
 waitmax
 0
 100
-24.0
+0.0
 1
 1
 NIL
@@ -794,7 +800,7 @@ POT
 POT
 0
 6000000
-6000000.0
+540000.0
 10000
 1
 NIL
