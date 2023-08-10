@@ -58,9 +58,17 @@ to setup
 end
 
 to go
+
+    ifelse count ships = 0 [
+    print "Spawn new Ship"
+  ][
+
+
+
   if passcount = 2[
     stop
   ]
+
   if passcount = 99[
     ;has to be here because the plot on the Dashboard only updates AFTER all procedures have run! Changing a value mid run is not plotted! Why do even bother with multithreading?
     plot-pen-up
@@ -70,6 +78,7 @@ to go
     update-plots
     set passcount 1
   ]
+
 
 
   if passcount = 0[
@@ -145,6 +154,7 @@ to go
 
 
   check-if-arrived
+  ]
 end
 
 
@@ -503,12 +513,17 @@ to connect-ports
 end
 
 to spawn-ships
-  create-ships 1[
-    set xcor 99
-    set ycor 22
-    set shape "containership"
-    set size 10
 
+  if count ships = 0
+  [
+    create-ships 1[
+      set xcor 99
+      set ycor 22
+      set shape "containership"
+      set size 10
+    ]
+    decide-wait-length
+  decide-blockage-length
   ]
 end
 
@@ -586,7 +601,7 @@ to check-if-arrived
     ;Ask ships[
      ; die
     ;]
-    spawn-ships
+
     connect-ports
 
     set isBlocked  0
@@ -594,8 +609,6 @@ to check-if-arrived
     set diverted 0
 
 
-    decide-wait-length
-    decide-blockage-length
 
     ifelse(passcount = 0)[
       set cost cost - POT
@@ -823,6 +836,23 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot cost2"
+
+BUTTON
+53
+506
+153
+539
+NIL
+spawn-ships
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
