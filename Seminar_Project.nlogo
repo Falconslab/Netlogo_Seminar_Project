@@ -699,9 +699,9 @@ SLIDER
 143
 costperday
 costperday
-1
-1000000
-64001.0
+0
+30000
+15000.0
 1000
 1
 NIL
@@ -716,7 +716,7 @@ blockedatday
 blockedatday
 0
 100
-14.0
+0.0
 1
 1
 NIL
@@ -731,7 +731,7 @@ freeatday
 freeatday
 0
 100
-100.0
+0.0
 1
 1
 NIL
@@ -792,10 +792,10 @@ SLIDER
 101
 POT
 POT
-1
-1000000
-299364.0
-1
+0
+6000000
+6000000.0
+10000
 1
 NIL
 HORIZONTAL
