@@ -37,7 +37,6 @@ to setup
   spawn-waypoints
   spawn-lanes
   connect-ports
-  spawn-ships
   set isBlocked  0
   set waiting 0
   set diverted 0
