@@ -733,7 +733,7 @@ SLIDER
 blockedatday
 blockedatday
 0
-100
+11
 0.0
 1
 1
@@ -748,8 +748,8 @@ SLIDER
 freeatday
 freeatday
 0
-100
-20.0
+50
+41.0
 1
 1
 NIL
@@ -789,10 +789,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot cost"
 
 SLIDER
-19
-282
-191
-315
+17
+275
+189
+308
 waitmin
 waitmin
 0
@@ -852,6 +852,28 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+1385
+492
+1442
+537
+Profit 1
+cost * -1
+0
+1
+11
+
+MONITOR
+1719
+494
+1776
+539
+Profit 2
+cost2 * -1
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
