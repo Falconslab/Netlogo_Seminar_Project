@@ -1,4 +1,7 @@
+; use extention
 extensions [ gis ]
+
+;declaration of global variables
 globals [
   countries-dataset
   should-draw-country-labels
@@ -13,11 +16,13 @@ globals [
   passcount
 ]
 
+;declare breeds
 breed [country-labels country-label]
 breed [ships ship]
 breed [ports port]
 breed [waypoints waypoint]
 
+; setup method draws countries, spawns ports and waypoints and the links inbetween each
 to setup
   clear-all
   ; Load the countries dataset
@@ -25,6 +30,8 @@ to setup
   ;set cities-dataset gis:load-dataset "data/cities.shp"
   ; Set the world envelope to the countries dataset's envelope
   gis:set-world-envelope (gis:envelope-of countries-dataset)
+
+  ; Check setting restricitons and raise an error
   if freeatday < blockedatday [
     error "The blockade needs to happen before it can be lifted"
     ]
@@ -32,14 +39,21 @@ to setup
     error "The blockage cant be happening while the vessle is in the canal"
   ]
 
+
+  ; call necessary functions
   draw-countries
   spawn-ports
   spawn-waypoints
   spawn-lanes
   connect-ports
+
+  ; Set variables
+
+  ; 0 = false 1 = true
   set isBlocked  0
   set waiting 0
   set diverted 0
+
   set passcount 0
 
   decide-wait-length
@@ -47,6 +61,8 @@ to setup
   set cost 0
   set cost2 0
 
+
+  ;clear and reset plots
   clear-all-plots
   set-current-plot "CostIndex 2"
   plot-pen-up
@@ -57,19 +73,19 @@ to setup
 end
 
 to go
-
+  ;Check if a Ship exists else remind user to spawn new ship
     ifelse count ships = 0 [
-    print "Spawn new Ship"
+    print "Please spawn new Ship"
   ][
 
-
-
+  ;Stop after two runs
   if passcount = 2[
     stop
   ]
 
+  ;Error handling
   if passcount = 99[
-    ;has to be here because the plot on the Dashboard only updates AFTER all procedures have run! Changing a value mid run is not plotted! Why do even bother with multithreading?
+
     plot-pen-up
     set-current-plot "CostIndex 2"
     plot-pen-down
@@ -79,7 +95,7 @@ to go
   ]
 
 
-
+  ; Calculate costs and advance tick depending on current run iteration
   if passcount = 0[
     set cost cost + costperday
     tick
@@ -98,6 +114,7 @@ to go
     tick
   ]
 
+  ;  Set Canal to blocked if requirements are met, set color to yellow and delete not used links to prevent ship from taking the wrong course
   ifelse ((ticks >= blockedatday) and (ticks < freeatday))[
     set isBlocked 1
     ]
@@ -119,7 +136,7 @@ to go
     ]
    ]
 
-
+  ;reduce blocking length
   if isBlocked = 1 [
     set blockageLength  blockageLength - 1
     ask waypoint 9[
@@ -133,7 +150,7 @@ to go
 
 
 
-
+   ; if ship is in front of the canal check whether it needs to wait or follow the diversion line
     ask ships[
       if xcor = 50 and ycor = 15 and isBlocked = 1 and waiting = 1[
          set waitlength waitlength - 2
@@ -151,22 +168,22 @@ to go
       ]
     ]
 
-
+  ; Check if ship arrived at its destination port
   check-if-arrived
   ]
 end
 
 
 
-; Draw the multi-polygon countries dataset to the drawing layer
+; Uses Gis to draw the countries
 to draw-countries
   gis:set-drawing-color green
   gis:draw countries-dataset 1
-  ;gis:draw
 end
 
+; Spawn start and destination port
 to spawn-ports
-  ; x and y cor in list then one of
+
   create-ports 1[
     set xcor 5
     set ycor 50
@@ -183,6 +200,8 @@ to spawn-ports
   ]
 end
 
+
+; Spawn waypoint flags
 to spawn-waypoints
   ;China to Eritrea
   create-waypoints 1 [
@@ -372,7 +391,7 @@ end
 
 
 
-
+; Set links between waypoints
 to spawn-lanes
   let current-waypoints-count  0
 
@@ -448,6 +467,8 @@ to spawn-lanes
 
 end
 
+
+; Set new links between the waypoints if the diversion route is taken
 to plot-diversion
   set diverted 1
   ask waypoint 10 [ask my-links[die]]
@@ -464,7 +485,7 @@ to plot-diversion
     ]
   ]
 
-
+;connect waypoints from waypoint 13 on
   ask waypoint 13[
     repeat 11[
       let current-waypoints  waypoint (who + current-waypoints-count)
@@ -489,7 +510,7 @@ end
 
 
 
-
+; Connect 'port' agents with nearest 'waypoint' agent
 to connect-ports
   ask port 0[
     create-link-with waypoint 26
@@ -511,6 +532,8 @@ to connect-ports
 
 end
 
+
+; spawns ship agent and sets wait and blockage length for the next run
 to spawn-ships
 
   if count ships = 0
@@ -526,38 +549,34 @@ to spawn-ships
   ]
 end
 
+
+;caluclate waiting lenght depending on given settings
 to decide-wait-length
   set waitlength waitmin + (random (waitmax - waitmin))
 end
 
+;calculate blocking length depending on given settings
 to decide-blockage-length
   set blockageLength freeatday - blockedatday
   set waiting 1
 end
 
-
-to check-blockage-counter
-
-
-end
-
-
-
-
-
-
+; function for ship to follow the waypoints to its destination
 to follow-line
 
   ask ships[
-
+    ;if ship is at the start port move to first waypoint
     ifelse xcor = 99 and ycor = 22 [
       move-to waypoint 2
     ]
+    ;else move to the closest waypoint with which a connections exists but was not visited already
     [
     let current-waypoint-cor [ (list xcor ycor)] of waypoints in-radius 3
     let current-waypoint waypoints with [xcor = first item 0 current-waypoint-cor and ycor = last item 0 current-waypoint-cor ]
     let curr-waypoint  one-of current-waypoint
     let destination-waypoint-end2 [[ (list xcor ycor)] of end2] of links with [end1 = curr-waypoint]
+
+    ;if no additional waypoint is available the ship either reached the end or an error has occured
     ifelse destination-waypoint-end2 = [] [
       ifelse xcor = -1 and ycor = 48 [
           move-to port 0
@@ -578,9 +597,10 @@ to follow-line
 
 end
 
+
+
 to check-if-arrived
     if Arrived? = true[
-      ;Do Money Stuff
     Ask ships[
       die
     ]
@@ -596,18 +616,13 @@ to check-if-arrived
       ]
       set waypointcount waypointcount + 1
     ]
-    spawn-lanes
-    ;Ask ships[
-     ; die
-    ;]
 
+    spawn-lanes
     connect-ports
 
     set isBlocked  0
     set waiting 0
     set diverted 0
-
-
 
     ifelse(passcount = 0)[
       set cost cost - POT
